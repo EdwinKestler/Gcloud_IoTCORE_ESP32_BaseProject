@@ -101,3 +101,8 @@ const int ex_num_topics = 1;
 const char* ex_topics[ex_num_topics] = {
   "/devices/atest-dev/reboot"
 };
+
+//timer intervals 
+
+unsigned long telemetry_publish_interval = 60000;
+unsigned long device_state_publish_interval = 300000;

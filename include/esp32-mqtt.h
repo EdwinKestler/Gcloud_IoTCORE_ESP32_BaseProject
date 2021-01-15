@@ -27,9 +27,14 @@
 
 String id_de_operacion;
 
+void ESPreboot(){
+  Serial.println(F("este dispositivo se reiniciara en 5 segundos..."));                                                   //imprimir mensaje de Aviso sobre reinicio remoto de unidad.
+  ESP.restart();              
+}
+
 void commands(String &payload){
   Serial.println(F("mensaje recibido de topico commandos"));
-  const int capacity = JSON_OBJECT_SIZE(1);
+  const int capacity = JSON_OBJECT_SIZE(3);
   StaticJsonDocument<capacity> edin_operation_json;
   
   DeserializationError err = deserializeJson(edin_operation_json, payload);
@@ -44,6 +49,11 @@ void commands(String &payload){
   
   Serial.print("idOperation: ");
   Serial.println(id_de_operacion);
+  if (id_de_operacion == "reboot"){
+    ESPreboot();
+  }else{
+    Serial.println(F("toro ese JSON por nara"));
+  }
 }
 
 // !!REPLACEME!!
@@ -74,6 +84,37 @@ String jwt;
 ///////////////////////////////
 String getDefaultSensor(){
   return "Wifi: " + String(WiFi.RSSI()) + "db";
+}
+
+String getDeviceState(){
+
+  uint32_t chipId = 0;
+
+  for(int i=0; i<17; i=i+8) {
+    chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+  }
+  
+  Serial.printf("ESP32 Chip model = %s Rev %d\n", ESP.getSdkVersion(), ESP.getChipRevision());
+  Serial.printf("This chip has %d cores\n", ESP.getFlashChipSpeed());
+  Serial.print("Chip ID: "); Serial.println(chipId);
+
+  const int capacity = JSON_OBJECT_SIZE(5);
+  StaticJsonDocument<capacity> edin_json_config_doc;
+  // create an object
+  JsonObject object = edin_json_config_doc.to<JsonObject>();
+    
+  char buf[16];
+  sprintf(buf, "IP:%d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );
+  Serial.println(String(buf));
+  object["chipID"]         = chipId ;
+  object["IpNodo"]         = String (buf);
+  object["State"]          = "ON";
+    
+  String output;
+  serializeJson(object, output);                                                                  //SAve CPU cycles by calculatinf the size.
+  Serial.println(F("publishing device manageTopic metadata:"));
+  Serial.println(output);
+  return output;
 }
 
 String getJwt(){
@@ -126,6 +167,10 @@ bool publishTelemetry(String subfolder, String data){
 
 bool publishTelemetry(String subfolder, const char *data, int length){
   return mqtt->publishTelemetry(subfolder, data, length);
+}
+
+bool publishState(String data){
+  return mqtt->publishState(data);
 }
 
 void connect(){
