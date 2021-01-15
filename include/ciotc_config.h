@@ -28,6 +28,10 @@ const char *device_id = "atest-dev";
 const char* ntp_primary = "pool.ntp.org";
 const char* ntp_secondary = "time.nist.gov";
 
+//subscription Topics
+
+const char commadsTopic[]    = "/devices/atest-dev/commands";                           //Topico del cual se reciben los mensajes de re-inicio
+
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
 #endif
@@ -91,9 +95,9 @@ const char *root_cert =
     "-----END CERTIFICATE-----\n";
 
 // In case we ever need extra topics
-const int ex_num_topics = 0;
-const char* ex_topics[ex_num_topics];
-//const int ex_num_topics = 1;
-//const char* ex_topics[ex_num_topics] = {
-//  "/devices/my-device/tbd/#"
-//};
+//const int ex_num_topics = 0;
+//const char* ex_topics[ex_num_topics];
+const int ex_num_topics = 1;
+const char* ex_topics[ex_num_topics] = {
+  "/devices/atest-dev/reboot"
+};

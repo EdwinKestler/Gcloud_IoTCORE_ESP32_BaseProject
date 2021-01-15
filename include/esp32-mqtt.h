@@ -22,12 +22,42 @@
 #include <CloudIoTCore.h>
 #include <CloudIoTCoreMqtt.h>
 #include "ciotc_config.h"                       // Update this file with your configuration
+#include <Arduino.h>
+#include <ArduinoJson.h>
+
+String id_de_operacion;
+
+void commands(String &payload){
+  Serial.println(F("mensaje recibido de topico commandos"));
+  const int capacity = JSON_OBJECT_SIZE(1);
+  StaticJsonDocument<capacity> edin_operation_json;
+  
+  DeserializationError err = deserializeJson(edin_operation_json, payload);
+  
+  if (err) {
+    Serial.print(F("deserializeJson() failed with code "));
+    Serial.println(err.c_str());
+    return;
+  }
+
+  id_de_operacion = edin_operation_json["idOperation"] | "idOperation";
+  
+  Serial.print("idOperation: ");
+  Serial.println(id_de_operacion);
+}
 
 // !!REPLACEME!!
 // The MQTT callback function for commands and configuration updates
 // Place your message handler code here.
 void messageReceived(String &topic, String &payload){
   Serial.println("incoming: " + topic + " - " + payload);
+  
+  if (topic == commadsTopic)
+  {
+    Serial.println(F("Remote Device commnad received"));                                                                    //imprimir mensaje de Aviso sobre reinicio remoto de unidad.
+    commands(payload);
+  }
+  
 }
 ///////////////////////////////
 
