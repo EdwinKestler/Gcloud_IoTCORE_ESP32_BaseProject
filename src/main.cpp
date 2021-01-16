@@ -23,7 +23,8 @@ void setup() {
   setupCloudIoT();
 }
 
-unsigned long lastMillis = 0;
+unsigned long last_Telemetry_Millis = 0;
+unsigned long last_State_Millis = 0;
 
 void loop() {
   mqtt->loop();
@@ -35,15 +36,15 @@ void loop() {
 
   // TODO: replace with your code
   // publish a message roughly every second.
-  if (millis() - lastMillis > telemetry_publish_interval) {
-    lastMillis = millis();
-    Serial.println(F("sending Telemetry data"));
+  if (millis() - last_Telemetry_Millis > telemetry_publish_interval) {
+    last_Telemetry_Millis = millis();
+    Serial.println(F("sending Telemetry data");
     //publishTelemetry(mqttClient, "/sensors", getDefaultSensor());
     publishTelemetry(getDefaultSensor());
   }
   
-  if (millis() - lastMillis > device_state_publish_interval) {
-    lastMillis = millis();
+  if (millis() - last_State_Millis > device_state_publish_interval) {
+    last_State_Millis = millis();
     Serial.println(F("Sending Device State Data"));
     publishState(getDeviceState());
   }
