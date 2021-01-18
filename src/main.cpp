@@ -38,7 +38,7 @@ void loop() {
   // publish a message roughly every second.
   if (millis() - last_Telemetry_Millis > telemetry_publish_interval) {
     last_Telemetry_Millis = millis();
-    Serial.println(F("sending Telemetry data");
+    Serial.println(F("sending Telemetry data"));
     //publishTelemetry(mqttClient, "/sensors", getDefaultSensor());
     publishTelemetry(getDefaultSensor());
   }
