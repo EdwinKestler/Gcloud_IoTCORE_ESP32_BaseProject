@@ -1,5 +1,6 @@
 /******************************************************************************
  * Copyright 2018 Google
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,16 +16,67 @@
 
 #include <Arduino.h>
 #include "esp32-mqtt.h"
+#include "SevSeg.h"
+
+#define CLR 16
+#define NUM_DIGITS 6
+
+//Create an instance of the object.
+SevSeg NSA1166Display;
+
+//Create global variables
+unsigned long timer;
+int deciSecond = 0;
+
+void clear_display () {
+    char CLR_String[NUM_DIGITS+1] = {CLR,CLR,CLR,CLR,CLR,CLR};
+
+    NSA1166Display.DisplayString(CLR_String, 0);
+  
+}
+
+
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   pinMode(LED_BUILTIN, OUTPUT);
   setupCloudIoT();
+  //Start the Display 
+  int displayType = COMMON_CATHODE; //Your display is either common cathode or common anode
+    
+  //This pinout is for a bubble dispaly
+  //Declare what pins are connected to the GND pins (cathodes)
+  int digit1 = 26; //- 4;  //Pin D2
+  int digit2 = 18; //- 13; //Pin D3
+  int digit3 = 19; //- 16; //Pin D4
+  int digit4 = 23; //- 17; //Pin D5
+  int digit5 = 22; //- 18; //Pin D6
+  int digit6 = 21; //-   19; //Pin D7
+       
+  //Declare what pins are connected to the segments (anodes)
+  int segA = 27;// - 21; //Pin D8
+  int segB = 25;// - 22; //Pin D9
+  int segC = 32;// - 23; //Pin D11
+  int segD = 4;//  - 25; //Pin D13
+  int segE = 17;// - 26; //Pin D12
+  int segF = 16;// - 27; //Pin A4
+  int segG = 2;// - 13 - TCK; //A5
+  int segDP= 33;//  - 27 - RXD; //RX0
+  int numberOfDigits = 6; //Do you have a 6 digit display?
+
+  NSA1166Display.Begin(displayType, numberOfDigits, digit1, digit2, digit3, digit4, digit5, digit6, segA, segB, segC, segD, segE, segF, segG, segDP);
+  
+  NSA1166Display.SetBrightness(100); //Set the display to 100% brightness level
+
+  timer = millis();
 }
 
 unsigned long last_Telemetry_Millis = 0;
 unsigned long last_State_Millis = 0;
+unsigned long last_LEDState_Millis = 0;
+
+
 
 void loop() {
   mqtt->loop();
@@ -41,6 +93,12 @@ void loop() {
     Serial.println(F("sending Telemetry data"));
     //publishTelemetry(mqttClient, "/sensors", getDefaultSensor());
     publishTelemetry(getDefaultSensor());
+  }
+
+  if (millis() - last_LEDState_Millis > device_LEDstate_publish_interval) {
+    Serial.println(F("dispalying Telemetry data"));
+    Display_Coin_String();
+    publishState(getDeviceState());
   }
   
   if (millis() - last_State_Millis > device_state_publish_interval) {

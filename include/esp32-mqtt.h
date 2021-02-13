@@ -25,7 +25,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-String id_de_operacion;
+String id_de_operacion, Display_Coin_name_json, Display_CoinPrice_json;
 
 void ESPreboot(){
   Serial.println(F("este dispositivo se reiniciara en 5 segundos..."));                                                   //imprimir mensaje de Aviso sobre reinicio remoto de unidad.
@@ -56,6 +56,68 @@ void commands(String &payload){
   }
 }
 
+char * Coin_nameString_to_array (String &str_Display_Coin_name_json) {
+  int str_len_Coin_name = str_Display_Coin_name_json.length() + 1;
+  char char_array_Coin_Name[str_len_Coin_name]; 
+  str_Display_Coin_name_json.toCharArray(char_array_Coin_Name, str_len_Coin_name);
+  return char_array_Coin_Name;
+}
+
+char * CoinPrice_to_array (String &str_CoinPrice_json) {
+  int str_len_Coin_name = str_CoinPrice_json.length() + 1;
+  char char_array_CoinPrice[str_len_Coin_name]; 
+  str_CoinPrice_json.toCharArray(char_array_CoinPrice, str_len_Coin_name);
+  return char_array_CoinPrice;
+}
+
+void ChainPriceDisplay(String &payload){
+  Serial.println(F("mensaje recibido de topico commandos"));
+  const int capacity = JSON_OBJECT_SIZE(3);
+  StaticJsonDocument<capacity> ChainCoinDisplay_json;
+  
+  DeserializationError err = deserializeJson(ChainCoinDisplay_json, payload);
+  
+  if (err) {
+    Serial.print(F("deserializeJson() failed with code "));
+    Serial.println(err.c_str());
+    return;
+  }
+
+  Display_Coin_name_json = ChainCoinDisplay_json["Coin"]| "Coin_Name";
+  Display_CoinPrice_json = ChainCoinDisplay_json["CoinPrice"]| "Coin_Coinprice";
+
+  Serial.print(F("Coin= "));
+  Serial.print(Display_Coin_name_json);
+  Serial.print(F(" : "));
+  Serial.print(F("Price= "));
+  Serial.print(Display_CoinPrice_json);
+
+  Coin_nameString_to_array( Display_Coin_name_json);   
+  CoinPrice_to_array (Display_CoinPrice_json); 
+}
+
+void Display_Coin_String(){
+
+  char tempString[7] = CoinPrice_to_array(); //Used for sprintf
+
+  for(int i =0;i<100;i++) {
+    NSA1166Display.DisplayString(tempString, 0); //(numberToDisplay, decimal point location)
+    delay(10);
+  }
+
+  tempString[7] = Coin_nameString_to_array(); //Used for sprintf
+
+  for(int i =0;i<100;i++) {
+     NSA1166Display.DisplayString(tempString, 0);
+    delay(10);
+  }
+  
+  delay(5);
+
+  clear_display (); //clears display
+  delay(1000);
+}
+
 // !!REPLACEME!!
 // The MQTT callback function for commands and configuration updates
 // Place your message handler code here.
@@ -66,6 +128,11 @@ void messageReceived(String &topic, String &payload){
   {
     Serial.println(F("Remote Device commnad received"));                                                                    //imprimir mensaje de Aviso sobre reinicio remoto de unidad.
     commands(payload);
+  }
+  if (topic== ChainCoinTopic)
+  {
+    Serial.println(F("Remote Display massage received"));
+    ChainPriceDisplay(payload);
   }
   
 }
