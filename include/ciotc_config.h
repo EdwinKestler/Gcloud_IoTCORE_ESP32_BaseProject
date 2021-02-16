@@ -31,7 +31,7 @@ const char* ntp_secondary = "time.nist.gov";
 //subscription Topics
 
 const char commadsTopic[]    = "/devices/atest-dev/commands";                           //Topico del cual se reciben los mensajes de re-inicio
-const char ChainCoinTopic[]  = "/devices/atest-dev/ChainCoinPrice";
+const char ChainCoinTopic[]  = "/devices/atest-dev/commands/COIN";
 
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
@@ -101,7 +101,6 @@ const char *root_cert =
 const int ex_num_topics = 2;
 const char* ex_topics[ex_num_topics] = {
   "/devices/atest-dev/reboot"
-  "/devices/atest-dev/ChainCoinPrice"
 };
 
 //timer intervals 

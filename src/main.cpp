@@ -18,25 +18,6 @@
 #include "esp32-mqtt.h"
 #include "SevSeg.h"
 
-#define CLR 16
-#define NUM_DIGITS 6
-
-//Create an instance of the object.
-SevSeg NSA1166Display;
-
-//Create global variables
-unsigned long timer;
-int deciSecond = 0;
-
-void clear_display () {
-    char CLR_String[NUM_DIGITS+1] = {CLR,CLR,CLR,CLR,CLR,CLR};
-
-    NSA1166Display.DisplayString(CLR_String, 0);
-  
-}
-
-
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -95,11 +76,11 @@ void loop() {
     publishTelemetry(getDefaultSensor());
   }
 
-  if (millis() - last_LEDState_Millis > device_LEDstate_publish_interval) {
+ /* if (millis() - last_LEDState_Millis > device_LEDstate_publish_interval) {
     Serial.println(F("dispalying Telemetry data"));
     Display_Coin_String();
     publishState(getDeviceState());
-  }
+  }*/
   
   if (millis() - last_State_Millis > device_state_publish_interval) {
     last_State_Millis = millis();

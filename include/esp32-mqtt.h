@@ -24,6 +24,18 @@
 #include "ciotc_config.h"                       // Update this file with your configuration
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include "SevSeg.h"
+
+#define CLR 16
+#define NUM_DIGITS 6
+
+//Create an instance of the object.
+SevSeg NSA1166Display;
+
+//Create global variables
+unsigned long timer;
+int deciSecond = 0;
+
 
 String id_de_operacion, Display_Coin_name_json, Display_CoinPrice_json;
 
@@ -56,23 +68,16 @@ void commands(String &payload){
   }
 }
 
-char * Coin_nameString_to_array (String &str_Display_Coin_name_json) {
-  int str_len_Coin_name = str_Display_Coin_name_json.length() + 1;
-  char char_array_Coin_Name[str_len_Coin_name]; 
-  str_Display_Coin_name_json.toCharArray(char_array_Coin_Name, str_len_Coin_name);
-  return char_array_Coin_Name;
-}
+void clear_display () {
+    char CLR_String[NUM_DIGITS+1] = {CLR,CLR,CLR,CLR,CLR,CLR};
 
-char * CoinPrice_to_array (String &str_CoinPrice_json) {
-  int str_len_Coin_name = str_CoinPrice_json.length() + 1;
-  char char_array_CoinPrice[str_len_Coin_name]; 
-  str_CoinPrice_json.toCharArray(char_array_CoinPrice, str_len_Coin_name);
-  return char_array_CoinPrice;
+    NSA1166Display.DisplayString(CLR_String, 0);
+  
 }
 
 void ChainPriceDisplay(String &payload){
   Serial.println(F("mensaje recibido de topico commandos"));
-  const int capacity = JSON_OBJECT_SIZE(3);
+  const int capacity = JSON_OBJECT_SIZE(8);
   StaticJsonDocument<capacity> ChainCoinDisplay_json;
   
   DeserializationError err = deserializeJson(ChainCoinDisplay_json, payload);
@@ -92,30 +97,44 @@ void ChainPriceDisplay(String &payload){
   Serial.print(F("Price= "));
   Serial.print(Display_CoinPrice_json);
 
-  Coin_nameString_to_array( Display_Coin_name_json);   
-  CoinPrice_to_array (Display_CoinPrice_json); 
-}
+ int str_len_Coin_price = Display_CoinPrice_json.length() + 1;
+ char char_array_CoinPrice[str_len_Coin_price];
+ Display_CoinPrice_json.toCharArray(char_array_CoinPrice, str_len_Coin_price);
 
-void Display_Coin_String(){
+ int str_len_Coin_name = Display_Coin_name_json.length() + 1;
+ char char_array_Coin_Name[str_len_Coin_name]; 
+ Display_Coin_name_json.toCharArray(char_array_Coin_Name, str_len_Coin_name);
 
-  char tempString[7] = CoinPrice_to_array(); //Used for sprintf
+ char tempString[7] = {'0','0','0','0','0','0'}; //Used for sprintf
+ 
+ for(int i =0;i<100;i++) {
 
-  for(int i =0;i<100;i++) {
-    NSA1166Display.DisplayString(tempString, 0); //(numberToDisplay, decimal point location)
-    delay(10);
-  }
+    tempString[0] = char_array_Coin_Name[0];
+    tempString[1] = char_array_Coin_Name[1];
+    tempString[2] = char_array_Coin_Name[2];
+    tempString[3] = char_array_Coin_Name[3];
+    tempString[4] = char_array_Coin_Name[4];
+    tempString[5] = char_array_Coin_Name[5];
+   
+   NSA1166Display.DisplayString(tempString, 0); //(numberToDisplay, decimal point location)
+   delay(10);
+ }
+ clear_display (); //clears display
+ memset(tempString, 0, sizeof(tempString)); 
 
-  tempString[7] = Coin_nameString_to_array(); //Used for sprintf
-
-  for(int i =0;i<100;i++) {
-     NSA1166Display.DisplayString(tempString, 0);
-    delay(10);
-  }
-  
-  delay(5);
-
-  clear_display (); //clears display
-  delay(1000);
+ for(int i =0;i<100;i++) {
+   tempString[0] = char_array_CoinPrice[0];
+   tempString[1] = char_array_CoinPrice[1];
+   tempString[2] = char_array_CoinPrice[2];
+   tempString[3] = char_array_CoinPrice[3];
+   tempString[4] = char_array_CoinPrice[4];
+   tempString[5] = char_array_CoinPrice[5];
+   
+   NSA1166Display.DisplayString(tempString, 0);
+   delay(10);
+ }
+ clear_display (); //clears display
+ delay(1000);
 }
 
 // !!REPLACEME!!
