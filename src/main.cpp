@@ -66,6 +66,7 @@ void loop() {
   if (!mqttClient->connected()) {
     connect();
   }
+  
 
   // TODO: replace with your code
   // publish a message roughly every second.
@@ -75,12 +76,6 @@ void loop() {
     //publishTelemetry(mqttClient, "/sensors", getDefaultSensor());
     publishTelemetry(getDefaultSensor());
   }
-
- /* if (millis() - last_LEDState_Millis > device_LEDstate_publish_interval) {
-    Serial.println(F("dispalying Telemetry data"));
-    Display_Coin_String();
-    publishState(getDeviceState());
-  }*/
   
   if (millis() - last_State_Millis > device_state_publish_interval) {
     last_State_Millis = millis();
