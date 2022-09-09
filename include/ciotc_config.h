@@ -16,7 +16,7 @@
 
 // Wifi network details.
 const char *ssid = "MANAGER";
-const char *password = "M!n!g3r2019";
+const char *password = "Mn!g3r2019";
 
 // Cloud iot details.
 const char *project_id = "flatbox-serverless-demos";
@@ -98,10 +98,8 @@ const char *root_cert =
 // In case we ever need extra topics
 //const int ex_num_topics = 0;
 //const char* ex_topics[ex_num_topics];
-const int ex_num_topics = 2;
-const char* ex_topics[ex_num_topics] = {
-  "/devices/atest-dev/reboot"
-};
+const int ex_num_topics = 0;
+const char* ex_topics[ex_num_topics];
 
 //timer intervals 
 
