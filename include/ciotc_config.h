@@ -16,7 +16,7 @@
 
 // Wifi network details.
 const char *ssid = "MANAGER";
-const char *password = "M@n@!g3r2022#";
+const char *password = "M@n@g3r2022#";
 
 // Cloud iot details.
 const char *project_id = "flatbox-serverless-demos";
