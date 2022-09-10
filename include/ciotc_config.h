@@ -21,8 +21,8 @@ const char *password = "M@n@g3r2022#";
 // Cloud iot details.
 const char *project_id = "flatbox-serverless-demos";
 const char *location = "us-central1";
-const char *registry_id = "atest-registry";
-const char *device_id = "atest-dev";
+const char *registry_id = "esp32registry";
+const char *device_id = "esp32test";
 
 // Configuration for NTP
 const char* ntp_primary = "pool.ntp.org";
@@ -30,8 +30,8 @@ const char* ntp_secondary = "time.nist.gov";
 
 //subscription Topics
 
-const char commadsTopic[]    = "/devices/atest-dev/commands";                           //Topico del cual se reciben los mensajes de re-inicio
-const char ChainCoinTopic[]  = "/devices/atest-dev/commands/COIN";
+const char commadsTopic[]    = "projects/flatbox-serverless-demos/topics/esp32PublishTopic";                           //Topico del cual se reciben los mensajes de re-inicio
+const char ChainCoinTopic[]  = "projects/flatbox-serverless-demos/topics/esp32PublishTopic";
 
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
@@ -45,10 +45,9 @@ const char ChainCoinTopic[]  = "/devices/atest-dev/commands/COIN";
 // of hex digits). If it's bigger and it starts with "00:" delete the "00:". If
 // it's smaller add "00:" to the start. If it's too big or too small something
 // is probably wrong with your key.
-const char *private_key_str =
-    "f7:5e:03:71:00:9e:9c:d9:c7:29:a0:df:a6:72:9f:"
-    "1e:91:32:42:4c:12:e7:b9:77:65:bb:ae:04:b6:51:"
-    "01:7b";
+const char *private_key_str = "ee:65:de:f8:65:8a:18:bb:02:9e:e5:f0:81:c7:81:"
+    "28:3f:46:6e:18:6d:1f:2b:f3:fa:87:e8:cc:f6:e5:"
+    "82:89";
     
 // Time (seconds) to expire token += 20 minutes for drift
 const int jwt_exp_secs = 60*20; // Maximum 24H (3600*24)
@@ -62,37 +61,36 @@ const int jwt_exp_secs = 60*20; // Maximum 24H (3600*24)
 
 const char *root_cert =
     "-----BEGIN CERTIFICATE-----\n"
-    "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\n"
-    "dzeUaFF4PZYvB5on3IW8vx1Szsk9ohk6hVI=\n"
+    "MIIFdzCCBF+gAwIBAgIRAMtWVBP6211QCg9c79Q6T+0wDQYJKoZIhvcNAQELBQAw\n"
+    "RjELMAkGA1UEBhMCVVMxIjAgBgNVBAoTGUdvb2dsZSBUcnVzdCBTZXJ2aWNlcyBM\n"
+    "TEMxEzARBgNVBAMTCkdUUyBDQSAxQzMwHhcNMjIwODIyMDgyNTM1WhcNMjIxMTE0\n"
+    "MDgyNTM0WjAeMRwwGgYDVQQDExNtcXR0Lmdvb2dsZWFwaXMuY29tMIIBIjANBgkq\n"
+    "hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp8flr808U2bayzO4K4pNuxql7pYjwE2p\n"
+    "R2yODo+qqqZF4rO2j51UpBQZMx2BX/ai1uINTvHBGDo2BDcMaqgb84mJF2fVBDuO\n"
+    "XnNYHBrd9C2us4qYBppS4flhmZEZLuI7trsoAOzz+H1EE8eTRnl3ZQFAeM4MfM1A\n"
+    "dpurw298K9TCZv7lYZ5KgLTXgHO9zvP507SENOQXnsJg/STKsLl4lhfEcmVha6d/\n"
+    "+Odaoft+mFv1Mo7Tduk1tTWp7+cnpKFdOWjEl76c796pl7bdd4XtozfpRIMODS5I\n"
+    "LniEKxwBIhHoMUvPpdk+vIWRUv0QP9jytTnSAPFA5eq0faC+SSCdewIDAQABo4IC\n"
+    "hjCCAoIwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAwGA1Ud\n"
+    "EwEB/wQCMAAwHQYDVR0OBBYEFKFkC5Km+Yk3ay8EluYkuZ0GfQpvMB8GA1UdIwQY\n"
+    "MBaAFIp0f6+Fze6VzT2c0OJGFPNxNR0nMGoGCCsGAQUFBwEBBF4wXDAnBggrBgEF\n"
+    "BQcwAYYbaHR0cDovL29jc3AucGtpLmdvb2cvZ3RzMWMzMDEGCCsGAQUFBzAChiVo\n"
+    "dHRwOi8vcGtpLmdvb2cvcmVwby9jZXJ0cy9ndHMxYzMuZGVyMDgGA1UdEQQxMC+C\n"
+    "E21xdHQuZ29vZ2xlYXBpcy5jb22CGG1xdHQtbXRscy5nb29nbGVhcGlzLmNvbTAh\n"
+    "BgNVHSAEGjAYMAgGBmeBDAECATAMBgorBgEEAdZ5AgUDMDwGA1UdHwQ1MDMwMaAv\n"
+    "oC2GK2h0dHA6Ly9jcmxzLnBraS5nb29nL2d0czFjMy96ZEFUdDBFeF9Gay5jcmww\n"
+    "ggEEBgorBgEEAdZ5AgQCBIH1BIHyAPAAdwApeb7wnjk5IfBWc59jpXflvld9nGAK\n"
+    "+PlNXSZcJV3HhAAAAYLE3ytYAAAEAwBIMEYCIQC5Z4zu0brXPoO1g+LBxKFhBpwY\n"
+    "oevaDTQTCyGpMvk8xwIhALbDZkOOv5aMBl/W7W1CmE1HJYPKAnVBYBdlVsCco8XL\n"
+    "AHUABZwB0yDgB4QTlYBJjRF8kDJmr69yULWvO0akPhGEDUoAAAGCxN8rhgAABAMA\n"
+    "RjBEAiBQHYM8vYym5x38RBIe45kywAjsxwrGShqgduNuelVovgIgQSOLF5toKez4\n"
+    "8SyBIMjEQJkR83WAoe9itEs8g31ozwQwDQYJKoZIhvcNAQELBQADggEBAB2qJB2k\n"
+    "JDiHpk12LGCMRiajm/5if3tsXQXSpmyqLldAQMIfPlPtV3RoVbC0OQSyKLmpfoRB\n"
+    "jcrq1HShcW0bRzBVl/8upEGEy3g5pE4VAB2mHl2zYTmj4d8+mc81Hl9px/wE85Xe\n"
+    "J895MS1NELjydPCP/kYnqvAl0kZtGjFBWt/o3UJ9vyBGd2HMvB2jPm+oNJJzV9FQ\n"
+    "LkoSYj45gz5x4mIGN8OOyhxvoHoLBFLt08Cp3/bhMehr85Qg3huslxZhix8ECCtf\n"
+    "puXVcpCwz/O0R3tSqDpl6XTU2bg7mPcG0SgqzBNHVLfmQMMucNp0mGgPggN6eAtD\n"
+    "aIbUmbr20Jnjlg8=\n"
     "-----END CERTIFICATE-----\n";
 
 // In case we ever need extra topics
