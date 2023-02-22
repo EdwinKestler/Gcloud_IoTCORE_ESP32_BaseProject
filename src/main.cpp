@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include <Arduino.h>
-#include "esp32-mqtt.h"
-#include "SevSeg.h"
+#include <esp32-mqtt.h>
+#include <SevSeg.h>   
 
 void setup() {
   // put your setup code here, to run once:
@@ -73,7 +73,6 @@ void loop() {
   if (millis() - last_Telemetry_Millis > telemetry_publish_interval) {
     last_Telemetry_Millis = millis();
     Serial.println(F("sending Telemetry data"));
-    //publishTelemetry(mqttClient, "/sensors", getDefaultSensor());
     publishTelemetry(getDefaultSensor());
   }
   
